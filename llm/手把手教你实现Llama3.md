@@ -24,7 +24,7 @@ Meta-Llama-3-8B
 
 ------
 
-![llama3](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_171617536.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_171617536.png" alt="llama3" style="zoom:80%;" />
 
 # 构建Transformer的输入
 
@@ -346,7 +346,7 @@ rope_theta = torch.tensor(config["rope_theta"])
 
 ## 编码：文本转tokens
 
-![tokens](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_214612456.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_214612456.png" alt="tokens" style="zoom:67%;" />
 
 我们使用上面加载的分词器`tokenizer`，将一段文本转为tokens，长度为17。
 
@@ -367,7 +367,7 @@ print(prompt_split_as_tokens)
 
 ## tokens转embedding
 
-![embeddings](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_221650056.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_221650056.png" alt="embeddings" style="zoom:67%;" />
 
 Embedding是神经网络模块的一部分，不需要用户实现，这里直接调用`torch.nn.Embedding`即可。
 
@@ -382,11 +382,11 @@ token_embeddings_unnormalized = embedding_layer(tokens).to(torch.bfloat16) # [17
 
 # 构建 Transformer 的第一层
 
-![Step of Transformer Block](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_222241997.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_222241997.png" alt="Step of Transformer Block" style="zoom:67%;" />
 
 ## 使用RMS对embedding归一化
 
-![Step of rms_norm](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_222442163.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_222442163.png" alt="Step of rms_norm" style="zoom:67%;" />
 
 我们平时做归一化，有种常见的方法，就是"减去均值，除以方差"：
 $$
@@ -427,7 +427,7 @@ token_embeddings = rms_norm(token_embeddings_unnormalized, model["layers.0.atten
 
 ## 实现Attention
 
-![Step of attention](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_222632635.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_222632635.png" alt="Step of attention" style="zoom:67%;" />
 
 我们先回忆一下，Self-Attention的计算公式：
 $$
@@ -457,7 +457,7 @@ torch.Size([4096, 4096]) torch.Size([1024, 4096]) torch.Size([1024, 4096]) torch
 
 ### Query
 
-![query](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223346892.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223346892.png" alt="query" style="zoom:67%;" />
 
 #### 展开Wq
 
@@ -473,7 +473,7 @@ q_layer0 = q_layer0.view(n_heads, head_dim, dim) # [32, 128, 4096]
 
 #### 计算Query
 
-![Q](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223418146.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223418146.png" alt="Q" style="zoom:67%;" />
 
 1. 先拿到一个头的`Wq`，形状为`[128, 4096]`:
 
@@ -504,7 +504,7 @@ q_per_token = torch.matmul(token_embeddings, q_layer0_head0.T) # [17, 128]
 
 可以看一下这段视频，学习RoPE的数学原理。https://www.youtube.com/watch?v=o29P0Kpobz0&t=530s    
 
-![RoPE](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223538448.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223538448.png" alt="RoPE" style="zoom:67%;" />
 
 简单来说，就是根据token的位置，在复平面上把query向量旋转某个角度。
 $$
@@ -582,11 +582,11 @@ plt.title('Plot of one row of freqs_cis')
 plt.show()
 ```
 
-![freqs](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_224820074.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_224820074.png" alt="freqs" style="zoom:67%;" />
 
 ##### 旋转Query
 
-![Rotation matrix](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223808896.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_223808896.png" alt="Rotation matrix" style="zoom:67%;" />
 
 我们可以将query pairs转换为复数，然后使用点积来旋转：
 
@@ -608,11 +608,11 @@ q_per_token_rotated = q_per_token_split_into_pairs_rotated.view(q_per_token.shap
 
 ### Key
 
-![Key](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225028384.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225028384.png" alt="Key" style="zoom:67%;" />
 
 根据Q与KV数量的对应关系，分为`1 : 1`，`n : m`, `n : 1`，分别叫做MHA（Multi-head Attention），GQA（Grouped-Query Attention），MQA（Multi-Query Attention）。
 
-![GQA](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225144272.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225144272.png" alt="GQA" style="zoom:67%;" />
 
 key的计算过程与query的计算过程几乎相同，唯一的区别是key的数量和query不同。
 
@@ -633,7 +633,7 @@ k_layer0_head0 = k_layer0[0] # [128, 4096]
 ```
 #### 计算Key
 
-![K](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225311078.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225311078.png" alt="K" style="zoom:67%;" />
 
 ```python
 # 计算不带位置信息的key向量
@@ -658,7 +658,7 @@ key的形状与query相同，都是[17, 128]，有17个token，每个token的key
 
 ### Attention Map
 
-![Attention Map](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225426284.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225426284.png" alt="Attention Map" style="zoom:67%;" />
 
 这一步计算Attention公式中的$\text{softmax}(Q*K^T/\sqrt{d_k})$部分，可以得到一个attention map，它描述了每个token的与它之前所有token的概率依赖程度。
 
@@ -687,7 +687,7 @@ def display_qk_heatmap(qk_per_token):
 display_qk_heatmap(qk_per_token)
 ```
 
-![Map](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225549700.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225549700.png" alt="Map" style="zoom:67%;" />
 
 #### Causal mask
 
@@ -746,7 +746,7 @@ qk_per_token_after_masking = qk_per_token + mask  # [17, 17]
 display_qk_heatmap(qk_per_token_after_masking)
 ```
 
-![mask](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225632341.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225632341.png" alt="mask" style="zoom:67%;" />
 
 
 #### Softmax
@@ -761,13 +761,13 @@ qk_per_token_after_masking_after_softmax = torch.nn.functional.softmax(qk_per_to
 display_qk_heatmap(qk_per_token_after_masking_after_softmax)
 ```
 
-![softmax](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225723272.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225723272.png" alt="softmax" style="zoom:67%;" />
 
 至此，我们得到了这个attention map。
 
 ### Value
 
-![Value](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225834831.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225834831.png" alt="Value" style="zoom:67%;" />
 
 value的计算方式和key相同，也是每4个value头之间共享权重，唯一的区别是没有位置编码。
 
@@ -785,7 +785,7 @@ v_layer0_head0 = k_layer0[0] # [128, 4096]
 
 #### 计算Value
 
-![V](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225915261.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_225915261.png" alt="V" style="zoom:67%;" />
 
 ```python
 v_per_token = torch.matmul(token_embeddings, v_layer0_head0.T) # [17, 128]
@@ -797,7 +797,7 @@ v_per_token = torch.matmul(token_embeddings, v_layer0_head0.T) # [17, 128]
 
 终于可以完整的计算Attention公式了。
 
-![Attention](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230006680.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230006680.png" alt="Attention" style="zoom:67%;" />
 
 attention map中的0~1值，相当于是一个加权值，用来确定每个token需要用到多少value。
 
@@ -807,17 +807,17 @@ qkv_attention = torch.matmul(qk_per_token_after_masking_after_softmax, v_per_tok
 
 ## 多头Attention
 
-![Step of Multi-head self attention](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230139442.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230139442.png" alt="Step of Multi-head self attention" style="zoom:67%;" />
 
 多头注意力的结构如下图所示：
 
-![Multi-head self attention](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230552118.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230552118.png" alt="Multi-head self attention" style="zoom:67%;" />
 
 ### 计算每个头
 
 前面提到，这个注意力模块有32个头，上面只是以第1个头为例，现在我们要写个循环，把所有头都计算出来，运算过程完全相同。
 
-![head](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230213701.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230213701.png" alt="head" style="zoom:67%;" />
 
 ```python
 qkv_attention_store = []
@@ -864,7 +864,7 @@ for head in range(n_heads):
 len(qkv_attention_store) # 32
 ```
 
-![Heads](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230346818.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230346818.png" alt="Heads" style="zoom:67%;" />
 
 我们现在有了第1层所有32个头的`qkv_attention`矩阵，接下来我要把它们合并成一个大小为 17 x 4096的大矩阵：
 
@@ -876,7 +876,7 @@ stacked_qkv_attention = torch.cat(qkv_attention_store, dim=-1) # [17, 4096]
 
 终止到了注意力模块的最后一步！
 
-![Concatenate](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230738771.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230738771.png" alt="Concatenate" style="zoom:67%;" />
 
 前面得到了32个头的Attention值，这里需要做一个线性变换，将他们融合起来：
 
@@ -891,7 +891,7 @@ embedding_delta = torch.matmul(stacked_qkv_attention, w_layer0.T) # [17, 4096]
 
 我们再添加一个残差连接，即：“Attention的输入值（未norm）+ 输出值"。
 
-![Step of skip connection](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230816308.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230816308.png" alt="Step of skip connection" style="zoom:67%;" />
 
 可以使得模型更容易地学习到恒等映射，从而避免了训练深度网络时常见的梯度消失问题：
 
@@ -901,7 +901,7 @@ embedding_after_edit = token_embeddings_unnormalized + embedding_delta # [17, 40
 
 对结果再来一次RMS归一化：
 
-![Step of rms_norm](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230839159.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230839159.png" alt="Step of rms_norm" style="zoom:67%;" />
 
 ```python
 embedding_after_edit_normalized = rms_norm(embedding_after_edit, model["layers.0.ffn_norm.weight"]) # [17, 4096]
@@ -911,7 +911,7 @@ embedding_after_edit_normalized = rms_norm(embedding_after_edit, model["layers.0
 
 ### SwiGLU
 
-![Step of FFN](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230922540.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_230922540.png" alt="Step of FFN" style="zoom:67%;" />
 
 在Llama3中，使用了SwiGLU激活函数的前馈网络，这种网络架构非常适合在模型需要时添加非线性。
 
@@ -922,7 +922,7 @@ SwiGLU到底有什么优点，这里强行解释一波：
 - SwiGLU 中的参数可以通过训练学习，使得模型可以根据不同任务和数据集动态调整这些参数，增强了模型的灵活性和适应性
 - 计算效率相比某些较复杂的激活函数（如 GELU）更高，同时仍能保持较好的性能。这对于大规模语言模型的训练和推理是很重要的考量因素
 
-![SwiGLU](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_232619760.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240623_202531818.png" alt="SwiGLU" style="zoom:67%;" />
 
 ```python
 w1 = model["layers.0.feed_forward.w1.weight"] # [14336, 4096]
@@ -938,7 +938,7 @@ output_after_feedforward = torch.matmul(fc_gate * fc_up, w2.T) # [17, 4096]
 
 我们再添加一个残差连接，即：“FFN的输入值（未norm）+ 输出值"。
 
-![Step of skip connection](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_232723695.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_232723695.png" alt="Step of skip connection" style="zoom:67%;" />
 
 可以使得模型更容易地学习到恒等映射，从而避免了训练深度网络时常见的梯度消失问题：
 
@@ -950,7 +950,7 @@ layer_0_embedding = embedding_after_edit + output_after_feedforward  # [17, 4096
 
 Llama3一共有32层Transformer，我只需要按照同样的方式，写个for循环，实现剩下的31层就行，每一层的输入都是上一层的输出。
 
-![All transformer layers](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_232936335.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_232936335.png" alt="All transformer layers" style="zoom:67%;" />
 
 ```python
 # embeddings input
@@ -1043,7 +1043,7 @@ final_embedding = rms_norm(final_embedding, model["norm.weight"]) # [17, 4096]
 
 # 构建Transformer的输出
 
-![Step of output](https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_233044019.png)
+<img src="https://raw.githubusercontent.com/liangxhao/blogs/markdown/imgs/2024/06/20240622_233044019.png" alt="Step of output" style="zoom:80%;" />
 
 假设我们站在最后1个token，即第17个token的上，预测第18个token的概率分布，这个概率分布肯定是一个长度为vocab_size的向量，表示每个词被命中的概率。
 
